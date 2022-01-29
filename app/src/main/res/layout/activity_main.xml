@@ -22,11 +22,23 @@
         android:textSize="25sp"
         android:id="@+id/btnKiir"/>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="KOORDINÁTÁK"
+        android:textSize="25sp"
+        android:id="@+id/btnKoord"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="25sp"
         android:textAlignment="center"
         android:id="@+id/textViewSzoveg"/>
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:id="@+id/imageViewKoordQr"/>
 
 </LinearLayout>
