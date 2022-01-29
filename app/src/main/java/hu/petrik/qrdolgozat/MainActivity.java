@@ -2,11 +2,13 @@ package hu.petrik.qrdolgozat;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -15,6 +17,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -152,15 +155,34 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
-            String seged = textViewSzoveg.getText().toString();
             if (result.getContents() == null) {
                 Toast.makeText(this, "Kiléptél a scannelésből", Toast.LENGTH_SHORT).show();
             } else {
-                textViewSzoveg.setText(result.getContents());
                 try {
-                    Uri uri = Uri.parse(seged);
-                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                    startActivity(intent);
+                    if(Patterns.WEB_URL.matcher(result.getContents()).matches()) {
+                        AlertDialog alertDialog;
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setMessage("Megnyitod a linket:\n" + result.getContents());
+                        builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                textViewSzoveg.setText(result.getContents());
+                            }
+                        });
+                        builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Uri uri = Uri.parse(result.getContents());
+                                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                                startActivity(intent);
+                                textViewSzoveg.setText(result.getContents());
+                            }
+                        });
+                        builder.setCancelable(false);
+                        alertDialog = builder.create();
+                        alertDialog.show();
+                    }
+                    textViewSzoveg.setText(result.getContents());
                 } catch (Exception e) {
                     Log.d("URI ERROR", e.toString());
                 }
